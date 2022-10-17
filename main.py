@@ -9,6 +9,15 @@ import tensorflow_hub as hub
 
 hub_model = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2')
 
+def img_to_aspect(img, max_dim=1024):
+    shape = tf.cast(tf.shape(img)[:-1], tf.float32)
+    long_dim = max(shape)
+    scale = max_dim / long_dim
+
+    new_shape = tf.cast(shape * scale, tf.int32)
+    img = tf.image.resize(img, new_shape)
+    return img
+
 def tensor_to_image(tensor):
     tensor = tensor*255
     tensor = np.array(tensor, dtype=np.uint8)
@@ -25,18 +34,18 @@ style_uploaded = False
 
 if content_image:
     content_image = Image.open(content_image)
-    content_image = content_image.resize((512, 512))
     content_image = tf.keras.preprocessing.image.img_to_array(content_image) / 255.0
-    content_image = np.array(content_image)[:, :, 0:3]
-    st.image(content_image)
+    content_image = content_image[:, :, 0:3]
+    content_image = img_to_aspect(content_image)
+    st.image(np.array(content_image))
     content_uploaded = True
 
 if style_image:
     style_image = Image.open(style_image)
-    style_image = style_image.resize((512, 512))
     style_image = tf.keras.preprocessing.image.img_to_array(style_image)/255.0
-    style_image = np.array(style_image)[:, :, 0:3]
-    st.image(style_image)
+    style_image = style_image[:, :, 0:3]
+    style_image = img_to_aspect(style_image)
+    st.image(np.array(style_image))
     style_uploaded = True
 
 if content_uploaded and style_uploaded:
