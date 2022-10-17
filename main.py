@@ -1,7 +1,6 @@
 import os
 os.environ['TFHUB_MODEL_LOAD_FORMAT'] = 'COMPRESSED'
 from PIL import Image
-import matplotlib.pyplot as plt
 import numpy as np
 
 import tensorflow as tf
@@ -41,10 +40,11 @@ if style_image:
     style_uploaded = True
 
 if content_uploaded and style_uploaded:
+    info = st.info("Loading Model")
     content_image = tf.constant(content_image)[np.newaxis, :, :, :]
     style_image = tf.constant(style_image)[np.newaxis, :, :, :]
-    print(style_image.shape, content_image.shape)
     stylized_image = hub_model(content_image, style_image)[0]
     st.image(tensor_to_image(stylized_image))
+    info.empty()
 
 
