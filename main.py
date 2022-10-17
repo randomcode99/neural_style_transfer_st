@@ -7,12 +7,7 @@ import tensorflow as tf
 import streamlit as st
 import tensorflow_hub as hub
 
-@st.cache
-def load_model():
-    hub_model = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2')
-    return hub_model
-
-hub_model = load_model()
+hub_model = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2')
 
 def img_to_aspect(img, max_dim=1024):
     shape = tf.cast(tf.shape(img)[:-1], tf.float32)
