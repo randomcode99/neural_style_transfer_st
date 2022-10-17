@@ -7,7 +7,12 @@ import tensorflow as tf
 import streamlit as st
 import tensorflow_hub as hub
 
-hub_model = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2')
+@st.cache
+def load_model():
+    hub_model = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2')
+    return hub_model
+
+hub_model = load_model()
 
 def img_to_aspect(img, max_dim=1024):
     shape = tf.cast(tf.shape(img)[:-1], tf.float32)
@@ -37,6 +42,7 @@ if content_image:
     content_image = tf.keras.preprocessing.image.img_to_array(content_image) / 255.0
     content_image = content_image[:, :, 0:3]
     content_image = img_to_aspect(content_image)
+    st.write("Content Image:")
     st.image(np.array(content_image))
     content_uploaded = True
 
@@ -45,11 +51,13 @@ if style_image:
     style_image = tf.keras.preprocessing.image.img_to_array(style_image)/255.0
     style_image = style_image[:, :, 0:3]
     style_image = img_to_aspect(style_image)
+    st.write("Style Image:")
     st.image(np.array(style_image))
     style_uploaded = True
 
 if content_uploaded and style_uploaded:
-    info = st.info("Loading Model")
+    info = st.info("Running Model...")
+    st.write("Generated Image:")
     content_image = tf.constant(content_image)[np.newaxis, :, :, :]
     style_image = tf.constant(style_image)[np.newaxis, :, :, :]
     stylized_image = hub_model(content_image, style_image)[0]
